@@ -20,12 +20,8 @@
 async function searchShows(query) {
   // TODO: Make an ajax request to the searchShows api.  Remove
   // hard coded data.
-    let $response = await axios.get(`http://api.tvmaze.com/search/shows?q=${query}`);
-    console.log($response.data);
-
-
-
-
+  let $response = await axios.get(`http://api.tvmaze.com/search/shows?q=${query}`);
+  // console.log($response.data);
   return $response.data;
 }
 
@@ -39,14 +35,16 @@ function populateShows(shows) {
   const $showsList = $("#shows-list");
   $showsList.empty();
 
-  for (let TvShow of shows) {
+  // changed 'show' to tvShows so we don't get lost in keys of returned object
+  for (let tvShow of shows) {
+    let noImageFound = 'https://tinyurl.com/tv-missing';
     let $item = $(
-      `<div class="col-md-6 col-lg-3 Show" data-show-id="${TvShow.show.id}">
-         <div class="card" data-show-id="${TvShow.show.id}">
-         <img class="card-img-top" src="${TvShow.show.image.medium}">
+      `<div class="col-md-6 col-lg-3 Show" data-show-id="${tvShow.show.id}">
+         <div class="card" data-show-id="${tvShow.show.id}">
+         <img class="card-img-top" src="${tvShow.show.image !== null ? tvShow.show.image.medium : noImageFound}">
            <div class="card-body">
-             <h5 class="card-title">${TvShow.show.name}</h5>
-             <p class="card-text">${TvShow.show.summary}</p>
+             <h5 class="card-title">${tvShow.show.name}</h5>
+             <p class="card-text">${tvShow.show.summary}</p>
            </div>
          </div>
        </div>
@@ -62,7 +60,7 @@ function populateShows(shows) {
  *    - get list of matching shows and show in shows list
  */
 
-$("#search-form").on("submit", async function handleSearch (evt) {
+$("#search-form").on("submit", async function handleSearch(evt) {
   evt.preventDefault();
 
   let query = $("#search-query").val();
