@@ -22,6 +22,8 @@ async function searchShows(query) {
   // hard coded data.
   let $response = await axios.get(`http://api.tvmaze.com/search/shows?q=${query}`);
   // console.log($response.data);
+
+  // *** From Code Review: map over data and pull only pertinant data: less to hold in memory
   return $response.data;
 }
 
@@ -82,6 +84,38 @@ async function getEpisodes(id) {
   // TODO: get episodes from tvmaze
   //       you can get this by making GET request to
   //       http://api.tvmaze.com/shows/SHOW-ID-HERE/episodes
+  let showEpisodes = await axios.get(`http://api.tvmaze.com/shows/${id}/episodes`);
+  // console.log(showEpisodes)
+  let episodeList = showEpisodes.data.map(episode => {
+    let eachEpisode = 
+    {
+      'id': episode.id,
+        'name': episode.name,
+          'season': episode.season,
+            'number': episode.number
+    }
+    return eachEpisode;
+  }
+  )
+  return episodeList;
 
+  // {id: 1234, name: "Pilot", season: "1", number: "1"},
   // TODO: return array-of-episode-info, as described in docstring above
 }
+
+
+// borrowing code from populateShows() for framework
+async function populateEpisodes(listOfEpisodes){
+  const $episodeList = $("#episodes-list");
+  $episodeList.empty();
+
+  for (let episode of listOfEpisodes) {
+    let $item = $(
+      `<li> ${episode.name}, ${episode.season}, ${episode.number} </li>`
+    )
+ ;
+
+    $episodeList.append($item);
+  }
+}
+let testingThing = getEpisodes(6560)
