@@ -44,7 +44,8 @@ function populateShows(shows) {
       `<div class="col-md-6 col-lg-3 Show" data-show-id="${tvShow.show.id}">
          <div class="card" data-show-id="${tvShow.show.id}">
          <img class="card-img-top" src="${tvShow.show.image !== null ? tvShow.show.image.medium : noImageFound}">
-           <div class="card-body">
+           <div class="card-body" data-show-id="${tvShow.show.id}">
+           <button class="episode-button">See Episodes</button>
              <h5 class="card-title">${tvShow.show.name}</h5>
              <p class="card-text">${tvShow.show.summary}</p>
            </div>
@@ -54,6 +55,12 @@ function populateShows(shows) {
 
     $showsList.append($item);
   }
+  $('.episode-button').on('click', async function (event) {
+    let gottenEpisodes = await getEpisodes($(event.target).parent().attr('data-show-id'))
+    populateEpisodes(gottenEpisodes);
+  });
+
+
 }
 
 
@@ -87,16 +94,15 @@ async function getEpisodes(id) {
   let showEpisodes = await axios.get(`http://api.tvmaze.com/shows/${id}/episodes`);
   // console.log(showEpisodes)
   let episodeList = showEpisodes.data.map(episode => {
-    let eachEpisode = 
-    {
+    return {
       'id': episode.id,
-        'name': episode.name,
-          'season': episode.season,
-            'number': episode.number
+      'name': episode.name,
+      'season': episode.season,
+      'number': episode.number
     }
-    return eachEpisode;
   }
   )
+  console.log(episodeList);
   return episodeList;
 
   // {id: 1234, name: "Pilot", season: "1", number: "1"},
@@ -105,7 +111,8 @@ async function getEpisodes(id) {
 
 
 // borrowing code from populateShows() for framework
-async function populateEpisodes(listOfEpisodes){
+function populateEpisodes(listOfEpisodes) {
+  //eventlistener the 'get episodes' button with 
   const $episodeList = $("#episodes-list");
   $episodeList.empty();
 
@@ -113,9 +120,10 @@ async function populateEpisodes(listOfEpisodes){
     let $item = $(
       `<li> ${episode.name}, ${episode.season}, ${episode.number} </li>`
     )
- ;
+      ;
 
     $episodeList.append($item);
   }
+
+  $('#episodes-area').show();
 }
-let testingThing = getEpisodes(6560)
